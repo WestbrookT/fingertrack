@@ -22,7 +22,7 @@ bench = ibench.ImageBench(screen)
 paths, dpoints = data.parse_datasets(keep_prob=.8, max_amount=100)
 #datagen = ibench.create_data_generator(paths, points, 100, 0)()
 
-model = model_v2('model_v2_4.h5')
+model = model_v2('model_v2_6.h5')
 points = []
 while True:
     for event in pygame.event.get():

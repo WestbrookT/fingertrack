@@ -711,7 +711,7 @@ def shuffle_examples(inputs, outputs, seed=1):
 
 
 
-def permute(pathname, points, size):
+def permute(pathname, points, size=50, rescale=.4, max_angle=10, max_scale=30, max_translate=20):
 
     # rotate first
     # scale
@@ -720,10 +720,10 @@ def permute(pathname, points, size):
 
     img = to_PIL(pathname)
 
-    img, points = scale_data(img, points, .4)
+    img, points = scale_data(img, points, rescale)
 
-    angle = random.randint(-10, 10)
-    scale = random.randrange(70,120)/100
+    angle = random.randint(-max_angle, max_angle)
+    scale = random.randrange(100-max_scale,100+max_scale-10)/100
     flip_bool = random.random() < .5
     
 
@@ -738,7 +738,7 @@ def permute(pathname, points, size):
         count += 1
     center = xc/count, yc/count
 
-    center = center[0] + random.randint(-20, 20), center[1] + random.randint(-20, 20)
+    center = center[0] + random.randint(-max_translate, max_translate), center[1] + random.randint(-max_translate, max_translate)
 
     img, points = rotate_data(img, points, angle)
     img, points = scale_data(img, points, scale)
@@ -751,7 +751,7 @@ def permute(pathname, points, size):
     return img, points
 
 
-def create_data_generator(pathnames, points, size, batch_size):
+def create_data_generator(pathnames, points, size, batch_size, rescale=.4, max_angle=10, max_scale=30, max_translate=20):
 
     while True:
         images = []
@@ -760,13 +760,13 @@ def create_data_generator(pathnames, points, size, batch_size):
             
             i = random.randint(0, len(pathnames)-1)
 
-            img, ipoints = permute(pathnames[i], points[i], size)
+            img, ipoints = permute(pathnames[i], points[i], size, rescale, max_angle, max_scale, max_translate)
             images.append(to_array(img))
             out_points.append(np.array(ipoints).flatten())
 
         if batch_size == 0:
             i = random.randint(0, len(pathnames)-1)
-            img, ipoints = permute(pathnames[i], points[i], size)
+            img, ipoints = permute(pathnames[i], points[i], size, rescale, max_angle, max_scale, max_translate)
             images.append(to_array(img))
             out_points.append(ipoints)
             yield np.array(images)[0], out_points[0]
@@ -774,7 +774,7 @@ def create_data_generator(pathnames, points, size, batch_size):
         yield np.array(images), np.array(out_points)
     
 
-def create_dataset(pathnames, points, size, count):
+def create_dataset(pathnames, points, size, count, rescale=.4, max_angle=10, max_scale=30, max_translate=20):
 
     images = []
     out_points = []
@@ -784,7 +784,7 @@ def create_dataset(pathnames, points, size, count):
 
 
         try:
-            img, ipoints = permute(pathnames[i], points[i], size)
+            img, ipoints = permute(pathnames[i], points[i], size, rescale, max_angle, max_scale, max_translate)
             
             if ipoints[0][0] == 0 and ipoints[0][1] == 0:
                 #print(ipoints)
@@ -799,11 +799,11 @@ def create_dataset(pathnames, points, size, count):
     if count == 0:
         i = random.randint(0, len(pathnames)-1)
         try:
-            img, ipoints = permute(pathnames[i], points[i], size)
+            img, ipoints = permute(pathnames[i], points[i], size, rescale, max_angle, max_scale, max_translate)
             iters = 0
             while ipoints[0][0] == 0 and ipoints[0][1] == 0:
                 #print(ipoints)
-                img, ipoints = permute(pathnames[i], points[i], size)
+                img, ipoints = permute(pathnames[i], points[i], size, rescale, max_angle, max_scale, max_translate)
                 iters += 1
                 if iters > 100:
                     break

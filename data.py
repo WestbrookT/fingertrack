@@ -53,7 +53,7 @@ def parse_datasets(keep_prob=.2, max_amount=1000):
             if len(images) > max_amount:
                 break
             
-
+    print('Paths found:', len(images))
     return images, points
 
 

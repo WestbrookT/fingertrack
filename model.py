@@ -45,6 +45,33 @@ def model_v2(model_path=None):
     model.add(Dense(500, activation='elu'))
     model.add(Dense(6, activation='elu'))
 
+    model.compile(optimizer=rms(decay=.0001, lr=.0005), loss=mse, metrics=['accuracy'])
+    model.summary()
+
+    if model_path != None:
+        model.load_weights(model_path)
+
+    return model
+
+def model_v3(model_path=None):
+
+    model = Sequential()
+
+    model.add(Conv2D(32, 3, input_shape=(150, 150, 3), activation='elu'))
+    model.add(MaxPool2D())
+    model.add(Conv2D(64, 3, activation='elu'))
+    model.add(MaxPool2D())
+    model.add(Conv2D(128, 3, activation='elu'))
+    model.add(MaxPool2D())
+    model.add(Conv2D(128, 3, activation='elu'))
+    model.add(MaxPool2D())
+    
+    model.add(Flatten())
+    model.add(Dense(500, activation='elu'))
+    model.add(Dense(500, activation='elu'))
+    model.add(Dense(500, activation='elu'))
+    model.add(Dense(6, activation='elu'))
+
     model.compile(optimizer=rms(decay=.0001), loss=mse, metrics=['accuracy'])
     model.summary()
 
